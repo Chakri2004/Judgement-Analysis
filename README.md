@@ -14,26 +14,26 @@ AI-powered legal judgement analysis system using NLP and RAG.
 - Bookmarking important cases
 
 ## Tech Stack
-# Programming Language
+- Programming Language
 - Python
-# Web Technologies
+- Web Technologies
 - HTML
 - CSS
 - JavaScript
-# Backend Framework
+- Backend Framework
 - Flask
-# Database
+- Database
 - MongoDB
-# ML Libraries
+- ML Libraries
 - PyTorch
 - Scikit-learn
-# NLP
+- NLP
 - Transformers
 - Sentence Embeddings
 - Retrieval-Augmented Generation (RAG)
-# Large Language Model (LLM)
+- Large Language Model (LLM)
 - Grok API (LLM for generating legal insights and summaries)
-# Vector Search
+- Vector Search
 - FAISS (Facebook AI Similarity Search)
 
 ## Datasets
