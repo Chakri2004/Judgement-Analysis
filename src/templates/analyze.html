@@ -1,0 +1,210 @@
+{% extends "home.html" %}
+{% block content %}
+<style>
+body{
+    background:#f5f5f5;
+    font-family: "Segoe UI",sans-serif;
+}
+.container-main{
+    max-width:900px;
+    margin:auto;
+    padding-top:40px;
+}
+.header{
+    text-align:center;
+    margin-bottom:35px;
+}
+.header h1{
+    font-size:38px;
+    font-weight:700;
+    color:black;
+}
+.header p{
+    color:#555;
+    font-size:16px;
+}
+.card{
+    background:white;
+    padding:40px;
+    border-radius:12px;
+    border:1px solid #e5e5e5;
+    box-shadow:0 5px 15px rgba(0,0,0,0.05);
+}
+textarea{
+    width:100%;
+    height:200px;
+    padding:14px;
+    border-radius:8px;
+    border:1px solid #d1d5db;
+    resize:none;
+    font-size:14px;
+}
+textarea:focus{
+    outline:none;
+    border:1px solid black;
+}
+.btn-main{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:8px;
+    background:#2563eb;
+    color:white;
+    font-size:16px;
+    font-weight:600;
+    cursor:pointer;
+    margin-top:20px;
+}
+.btn-main:hover{
+    background:#1e40af;
+}
+.sample-btn{
+    padding:7px 14px;
+    border:1px solid #ccc;
+    background:white;
+    color:black;
+    border-radius:6px;
+    margin-bottom:10px;
+    cursor:pointer;
+    font-size:13px;
+}
+.sample-btn:hover{
+    background:#f3f3f3;
+}
+.upload-box{
+    border:2px dashed #ccc;
+    padding:40px;
+    border-radius:12px;
+    text-align:center;
+    background:white;
+    display:block;
+    cursor:pointer;
+    transition:0.2s;
+}
+.upload-box:hover{
+    background:#f9fafc;
+    border-color:#2563eb;
+}
+.upload-box input{
+    display:none;
+}
+.upload-btn{
+    padding:10px 20px;
+    background:black;
+    border:none;
+    color:white;
+    border-radius:6px;
+    font-size:14px;
+    cursor:pointer;
+}
+.upload-btn:hover{
+    background:#333;
+}
+.upload-text{
+    margin-top:12px;
+    color:#666;
+}
+.upload-box.dragging{
+    border-color:#2563eb;
+    background:#eef3ff;
+}
+.file-name{
+    margin-top:10px;
+    font-weight:600;
+    color:black;
+}
+.section-title{
+    margin-top:25px;
+    margin-bottom:10px;
+    font-weight:600;
+    font-size:16px;
+    color:black;
+}
+</style>
+<div class="container-main">
+    <div class="header">
+        <h1>AI Legal Judgement Analyzer</h1>
+        <p>
+            Upload or paste a judgement to automatically classify the case,
+            detect legal issues, and retrieve relevant legal provisions using AI.
+        </p>
+    </div>
+    <div class="card">
+        <h2 style="margin-bottom:5px;">Judgement Analysis</h2>
+        <p style="color:#6b7280;margin-bottom:20px;">
+            AI-based Hierarchical Legal Intelligence System
+        </p>
+        <form method="POST" enctype="multipart/form-data">
+            <div class="section-title">Paste Text</div>
+            <textarea name="judgement" id="judgementBox"
+            placeholder="Paste text here..."></textarea>
+            <div class="section-title">Upload PDF</div>
+            <label class="upload-box" id="dropArea">
+                <input id="pdfUpload" type="file" name="pdf_file" accept=".pdf">
+                <div id="uploadContent">
+                    <p class="upload-text">
+                        Drag & Drop your PDF here
+                    </p>
+                    <p style="color:#888;font-size:13px;">or click to upload</p>
+                </div>
+            </label>
+            <p id="fileName" class="file-name"></p>
+            <button type="submit" class="btn-main" id="analyzeBtn">
+                Analyze
+            </button>
+        </form>
+    </div>
+</div>
+<script>
+function loadSample(){
+    document.getElementById("judgementBox").value =
+    `The petitioner filed an appeal under Section 389 CrPC seeking suspension of sentence during the pendency of the appeal. The court examined whether exemption from personal appearance could be granted and whether adjournment of the case was justified.`;
+}
+document.getElementById("pdfUpload").addEventListener("change", function(){
+    const file = this.files[0];
+    if(file){
+        let size = (file.size / 1024 / 1024).toFixed(2);
+        document.getElementById("fileName").innerHTML =
+        '<img src="/static/pdf-icon.png" style="width:22px;margin-right:6px;vertical-align:middle;">'
+        + file.name + " (" + size + " MB)";
+    }
+});
+document.querySelector("form").addEventListener("submit", function(e){
+    const text = document.getElementById("judgementBox").value.trim();
+    const file = document.getElementById("pdfUpload").files.length;
+    if(!text && !file){
+        alert("Please paste text or upload a PDF.");
+        e.preventDefault();
+        return;
+    }
+    document.getElementById("analyzeBtn").innerText="Analyzing...";
+});
+const dropArea = document.getElementById("dropArea");
+const fileInput = document.getElementById("pdfUpload");
+["dragenter","dragover"].forEach(eventName=>{
+    dropArea.addEventListener(eventName, (e)=>{
+        e.preventDefault();
+        dropArea.style.borderColor="#2563eb";
+        dropArea.style.background="#eef3ff";
+    });
+});
+["dragleave","drop"].forEach(eventName=>{
+    dropArea.addEventListener(eventName, (e)=>{
+        e.preventDefault();
+        dropArea.style.borderColor="#ccc";
+        dropArea.style.background="white";
+    });
+});
+dropArea.addEventListener("drop",(e)=>{
+    const files = e.dataTransfer.files;
+    if(files.length){
+        fileInput.files = files;
+        const file = files[0];
+        let size = (file.size / 1024 / 1024).toFixed(2);
+        document.getElementById("fileName").innerHTML =
+        '<img src="/static/pdf-icon.png" style="width:22px;margin-right:6px;vertical-align:middle;">'
+        + file.name + " (" + size + " MB)";
+    }
+});
+</script>
+{% endblock %}

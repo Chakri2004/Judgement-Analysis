@@ -1,0 +1,119 @@
+{% extends "home.html" %}
+{% block content %}
+<style>
+.help-container{
+    max-width:900px;
+    margin:auto;
+    background:white;
+    padding:40px;
+    border-radius:12px;
+    box-shadow:0 8px 25px rgba(0,0,0,0.06);
+}
+.help-title{
+    font-size:32px;
+    font-weight:700;
+    color:#000;
+    margin-bottom:10px;
+}
+.help-sub{
+    color:#666;
+    margin-bottom:30px;
+}
+.help-step{
+    margin-top:20px;
+    padding:20px;
+    background:#f8fafc;
+    border-left:5px solid black;
+    border-radius:6px;
+}
+.step-number{
+    font-weight:700;
+    color:#000;
+    margin-bottom:8px;
+    font-size:16px;
+}
+.help-list{
+    margin-top:10px;
+    padding-left:0;
+}
+.help-list li{
+    list-style:none;
+    margin-bottom:8px;
+    padding-left:18px;
+    position:relative;
+    color:#555;
+}
+.help-list li::before{
+    content:"";
+    width:8px;
+    height:8px;
+    background:black;
+    border-radius:50%;
+    position:absolute;
+    left:0;
+    top:7px;
+}
+</style>
+<div class="help-container">
+    <div class="help-title">Help & User Guide</div>
+    <p class="help-sub">
+        Learn how to use the AI Legal Judgement Analyzer to analyze court judgements,
+        detect legal issues, and generate reports.
+    </p>
+    <div class="help-step">
+        <div class="step-number">Step 1 — Open the Analysis Page</div>
+        <p>
+            Click on <b>Analyze</b> in the navigation bar to open the judgement analysis page.
+            This is where you submit the judgement for AI analysis.
+        </p>
+    </div>
+    <div class="help-step">
+        <div class="step-number">Step 2 — Provide the Judgement</div>
+        <p>You can provide the court judgement in two ways:</p>
+        <ul class="help-list">
+            <li><b>Paste Text</b> — Copy and paste the judgement text into the text box.</li>
+            <li><b>Upload PDF</b> — Upload a court judgement PDF file.</li>
+        </ul>
+    </div>
+    <div class="help-step">
+        <div class="step-number">Step 3 — Run AI Analysis</div>
+        <p>
+            Click the <b>Analyze Judgement</b> button.  
+            The system will process the judgement using Artificial Intelligence and legal retrieval methods.
+        </p>
+    </div>
+    <div class="help-step">
+        <div class="step-number">Step 4 — View Analysis Results</div>
+        <p>The system will automatically detect:</p>
+        <ul class="help-list">
+            <li>Main case category (Civil / Criminal)</li>
+            <li>Nature of the legal dispute</li>
+            <li>Relevant legal provisions</li>
+            <li>Important legal issues in the case</li>
+            <li>Confidence score of the classification</li>
+        </ul>
+    </div>
+    <div class="help-step">
+        <div class="step-number">Step 5 — Save and Review Cases</div>
+        <p>
+            Every analyzed judgement is automatically saved to your account.
+            You can view them later in the <b>My Cases</b> or <b>Dashboard</b> section.
+        </p>
+    </div>
+    <div class="help-step">
+        <div class="step-number">Step 6 — Export the Report</div>
+        <p>
+            You can export the analysis report as a <b>PDF document</b> from the case page.
+            This report includes the case category, legal provisions, and detected issues.
+        </p>
+    </div>
+    <div class="help-step">
+        <div class="step-number">Step 7 — Manage Your Cases</div>
+        <ul class="help-list">
+            <li>View full analysis results</li>
+            <li>Delete cases if needed</li>
+            <li>Export reports</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

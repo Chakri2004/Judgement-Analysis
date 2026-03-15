@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Document Review</title>
+        <style>
+        body{
+            font-family: "Segoe UI", sans-serif;
+            background:#f4f6fb;
+            padding:40px;
+        }
+        .container{
+            max-width:1100px;
+            margin:auto;
+        }
+        h1{
+            margin-bottom:25px;
+            color:#2c3e50;
+        }
+        .card{
+            background:white;
+            padding:30px;
+            border-radius:12px;
+            box-shadow:0 8px 25px rgba(0,0,0,0.05);
+        }
+        .meta-grid{
+            display:grid;
+            grid-template-columns:1fr 1fr 80px;
+            gap:20px;
+            margin-bottom:25px;
+            align-items:center;
+        }
+        .meta-box{
+            background:#f8f9fc;
+            padding:15px;
+            border-radius:8px;
+        }
+        .meta-title{
+            font-size:13px;
+            color:#777;
+            margin-bottom:5px;
+        }
+        .meta-value{
+            font-weight:600;
+            font-size:15px;
+        }
+        .category-text{
+            font-size:18px;
+            font-weight:600;
+            color:#2c3e50;
+        }
+        .badge{
+            padding:6px 14px;
+            border-radius:20px;
+            font-size:12px;
+            color:white;
+            display:inline-block;
+        }
+        .civil{ 
+            background:#2ecc71; 
+        }
+        .criminal{ 
+            background:#e74c3c; 
+        }
+        .section-title{
+            margin-top:25px;
+            margin-bottom:10px;
+            font-weight:600;
+            font-size:18px;
+            border-left:4px solid #2c7be5;
+            padding-left:10px;
+        }
+        .summary{
+            background:#f9fafc;
+            padding:15px;
+            border-radius:8px;
+            line-height:1.6;
+        }
+        .document-box{
+            background:#fafafa;
+            padding:20px;
+            border-radius:10px;
+            border:1px solid #eee;
+            max-height:400px;
+            overflow-y:auto;
+            white-space:pre-wrap;
+            line-height:1.6;
+        }
+        .actions{
+            margin-top:25px;
+        }
+        .btn{
+            padding:10px 18px;
+            border-radius:6px;
+            border:none;
+            font-size:14px;
+            cursor:pointer;
+            text-decoration:none;
+            display:inline-block;
+        }
+        .btn-export{
+            background:#2c7be5;
+            color:white;
+        }
+        .btn-export:hover{
+            background:#1a68e5;
+        }
+        .footer-actions{
+            display:flex;
+            justify-content:space-between;
+            margin-top:30px;
+        }
+        .btn-bookmark{
+            background:#f1c40f;
+            color:black;
+            margin-left:10px;
+        }
+
+        .btn-bookmark:hover{
+            background:#f39c12;
+        }
+        .btn-dashboard{
+            background:#2c3e50;
+            color:white;
+        }
+        .btn-dashboard:hover{
+            background:#1c2a36;
+        }
+        .bookmark-box{
+            display:flex;
+            justify-content:center;
+            align-items:center;
+        }
+
+        .bookmark-star{
+            background:none;
+            border:none;
+            font-size:26px;
+            cursor:pointer;
+            color:black;
+        }
+
+        .bookmark-star:hover{
+            transform:scale(1.1);
+        }
+        .toast{
+            position:fixed;
+            bottom:25px;
+            left:50%;
+            transform:translateX(-50%);
+            background:#111;
+            color:white;
+            padding:12px 20px;
+            border-radius:8px;
+            opacity:0;
+            transition:0.3s;
+        }
+        .toast.show{
+            opacity:1;
+        }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Document Review</h1>
+            <div class="card">
+                <div class="meta-grid">
+                    <div class="meta-box">
+                        <div class="meta-title">Main Category</div>
+                        <div class="meta-value category-text">
+                            {{ doc.main_category }} Case
+                        </div>
+                    </div>
+                    <div class="meta-box">
+                        <div class="meta-title">Confidence Score</div>
+                        <div class="meta-value">
+                            {{ doc.confidence }}%
+                        </div>
+                    </div>
+                    <div class="meta-box bookmark-box">
+                        <button class="bookmark-star"
+                            onclick="toggleBookmark('{{ doc._id }}', this)">
+                            {% if doc.bookmarked %}
+                            ★
+                            {% else %}
+                            ☆
+                            {% endif %}
+
+                        </button>
+                    </div>
+                </div>
+                <p><b>Case Name:</b> {{ doc.case_name if doc.case_name else "Unknown Case" }}</p>
+                <div class="section-title">Case Summary</div>
+                <div class="summary">
+                    {{ doc.nature_of_dispute }}
+                </div>
+                <div class="section-title">Original Submitted Content</div>
+                <div class="document-box">
+                    {{ doc.text }}
+                </div>
+                <div class="actions">
+                    <a href="{{ url_for('export_pdf', id=doc._id) }}" class="btn btn-export">
+                        Export PDF
+                    </a>
+                </div>
+
+            </div>
+            <div class="footer-actions">
+                <a href="{{ url_for('dashboard') }}" class="btn btn-dashboard">
+                    Back to Dashboard
+                </a>
+            </div>
+        </div>
+        <div id="toast" class="toast"></div>
+        <script>
+            async function toggleBookmark(id,btn){
+                let response = await fetch("/bookmark/"+id,{
+                    method:"POST"
+                })
+                let data = await response.json()
+                if(data.bookmarked){
+                    btn.innerText="★"
+                }else{
+                    btn.innerText="☆"
+                }
+                let toast=document.getElementById("toast")
+                toast.innerText=data.bookmarked
+                ? "Bookmark added"
+                : "Bookmark removed"
+                toast.classList.add("show")
+                setTimeout(()=>{
+                    toast.classList.remove("show")
+                },2000)
+            }
+        </script>
+    </body>
+</html>

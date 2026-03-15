@@ -1,0 +1,23 @@
+{% extends "home.html" %}
+{% block content %}
+<div style="text-align:center; margin-top:100px;">
+    <h1 style="font-size:54px;">AI Legal Judgement Analyzer</h1>
+    <p style="color:#666; max-width:600px; margin:auto;">
+        Analyze court judgements using Artificial Intelligence.
+        Detect legal issues, classify case types, and retrieve relevant legal provisions.
+    </p>
+    <a href="{{ url_for('analyze') }}">
+        <button style="
+            margin-top:30px;
+            padding:14px 35px;
+            background:#2c7be5;
+            color:white;
+            border:none;
+            border-radius:8px;
+            font-size:16px;
+            cursor:pointer;">
+            Start Analysis
+        </button>
+    </a>
+</div>
+{% endblock %}

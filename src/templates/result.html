@@ -1,0 +1,21 @@
+{% extends "home.html" %}
+{% block content %}
+<div class="card">
+    <h2>Main Category: {{ main_category }}</h2>
+    <p>Confidence: {{ confidence }}%</p>
+    {% if main_category == "Civil" %}
+        <h3>Detected Civil Subdivisions</h3>
+        {% if subdivisions and subdivisions|length > 0 %}
+            {% for sub in subdivisions %}
+                <div class="subdivision-card">
+                    <b>{{ sub.title }}</b><br>
+                    Law: {{ sub.law }}<br>
+                    Severity: {{ sub.severity }}
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No civil subdivisions detected.</p>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}

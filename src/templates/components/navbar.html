@@ -1,0 +1,132 @@
+<style>
+.navbar {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:25px 40px;
+    background:rgb(236, 235, 235);
+    color:black;
+}
+.nav-links { 
+    display:flex; 
+    gap:20px; 
+    align-items:center; 
+}
+.nav-links a {
+    color:black;
+    text-decoration:none;
+    padding:5px 8px;
+    transition:0.3s;
+    font-weight: bold;
+}
+.nav-links a:hover {
+    text-decoration: underline;
+}
+.nav-link i{
+font-size:18px;
+color:black;
+cursor:pointer;
+transition:0.3s;
+}
+
+.nav-link i:hover{
+transform:scale(1.2);
+}
+.custom-brand {
+    color: black !important;
+    text-decoration: none !important;
+    font-size: 22px;
+    font-weight: bold;
+}
+.custom-brand:hover {
+    text-decoration: none !important;
+}
+.search-icon {
+    cursor:pointer;
+    font-size:18px;
+    transition:0.3s;
+}
+.search-icon:hover {
+    transform:scale(1.2);
+}
+.dropdown {
+    position:relative;
+    cursor:pointer;
+}
+.user-box {
+    border:1px solid white;
+    padding:6px 12px;
+    border-radius:6px;
+    transition:0.3s;
+}
+.user-box:not(.avatar-circle):hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+.avatar-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #000;
+    color: #fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:600;
+    font-size:15px;
+    cursor:pointer;
+}
+.dropdown-content {
+    display:none;
+    position:absolute;
+    right:0;
+    background:white;
+    min-width:140px;
+    box-shadow:0 8px 16px rgba(0,0,0,0.1);
+    border-radius:6px;
+}
+.dropdown-content a {
+    display:block;
+    padding:10px;
+    color:black;
+    text-decoration:none;
+}
+.dropdown-content a:hover { 
+    background:#f2f2f2; 
+}
+</style>
+<div class="navbar">
+    <div>
+        <a class="custom-brand" href="{{ url_for('home') }}" target="_self">
+            Judgement Analysis
+        </a>
+    </div>
+    <div class="nav-links">
+        <a href="{{ url_for('my_cases') }}">My Cases</a>
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        <a href="/help">Help</a>
+        <div class="search-icon" onclick="openSearch()">
+            <i class="fas fa-search"></i>
+        </div>
+        <a href="{{ url_for('bookmarks') }}" class="nav-link">
+<i class="fa-regular fa-star"></i>
+</a>
+        {% if current_user.is_authenticated %}
+        <div class="dropdown" id="userDropdown">
+            <div class="user-box avatar-circle">
+                {% set name_parts = current_user.name.split() %}
+                {% if name_parts|length > 1 %}
+                    {{ name_parts[0][0]|upper }}{{ name_parts[1][0]|upper }}
+                {% else %}
+                    {{ name_parts[0][0]|upper }}
+                {% endif %}
+            </div>
+            <div class="dropdown-content">
+                <a href="{{ url_for('profile') }}">My Account</a>
+                <a href="{{ url_for('auth.logout') }}">Logout</a>
+            </div>
+        </div>
+        {% else %}
+            <a href="{{ url_for('auth.login') }}" class="user-box">Login</a>
+        {% endif %}
+    </div>
+</div>

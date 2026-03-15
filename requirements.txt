@@ -1,0 +1,11 @@
+flask
+flask-login
+python-dotenv
+pymongo
+pdfplumber
+numpy
+faiss-cpu
+sentence-transformers
+groq
+reportlab
+werkzeug

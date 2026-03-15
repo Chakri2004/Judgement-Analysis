@@ -1,0 +1,297 @@
+{% extends "home.html" %}
+{% block content %}
+<style>
+    .result-container {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+    .badge {
+        display: inline-block;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+    .civil { background: #e6f4ea; color: #1e7e34; }
+    .criminal { background: #fdecea; color: #b02a37; }
+    .constitutional { background: #fff8e1; color: #b58900; }
+    .administrative { background: #e7f1ff; color: #0d6efd; }
+    .section-title {
+        margin-top: 25px;
+        margin-bottom: 10px;
+        font-size: 18px;
+        font-weight: bold;
+        border-left: 4px solid #4a90e2;
+        padding-left: 10px;
+    }
+    .sub-card {
+        background: #f9fafc;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        border: 1px solid #eee;
+    }
+    .confidence-box {
+        background: #f1f8ff;
+        padding: 15px;
+        border-radius: 8px;
+        font-weight: 600;
+        margin-bottom: 20px;
+    }
+    .explain-box {
+        background: #fff5e6;
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 4px solid #ff9800;
+        margin-top: 20px;
+    }
+</style>
+<div class="result-container">
+    <div class="badge" style="background:#eef3ff;color:#2c3e50;">
+        {{ main_category }}
+    </div>
+    <h3 style="margin-bottom:15px;">
+        Case Name: {{ case_name if case_name != "Unknown Case" else "Case Title Not Found" }}
+    </h3>
+    {% if petitioner and respondent %}
+    <div class="sub-card">
+        {% if petitioner %}
+        <p><b>Petitioner:</b> {{ petitioner }}</p>
+        {% endif %}
+
+        {% if respondent %}
+        <p><b>Respondent:</b> {{ respondent }}</p>
+        {% endif %}
+    </div>
+    {% endif %}
+    {% if entities %}
+    
+    <div class="section-title">Named Entities Detected</div>
+    {% if entities.persons %}
+    <div class="sub-card">
+        <b>Persons</b>
+        <ul>
+            {% for p in entities.persons %}
+            <li>{{ p }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+    {% if entities.organizations %}
+    <div class="sub-card">
+        <b>Organizations</b>
+        <ul>
+            {% for o in entities.organizations %}
+            <li>{{ o }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+    {% if entities.dates %}
+    <div class="sub-card">
+        <b>Entity Dates</b>
+        <ul>
+            {% for d in entities.dates %}
+            <li>{{ d }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+    {% endif %}
+    
+    {% if dates %}
+    <div class="section-title">Important Dates</div>
+    <div class="sub-card">
+        <ul>
+            {% for d in dates %}
+            <li>{{ d }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+    {% if timeline %}
+    <div class="section-title">Case Timeline</div>
+    <div class="sub-card">
+        <ul>
+            {% for key, value in timeline.items() %}
+            <li><strong>{{ key }}:</strong> {{ value }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+    {% if acts %}
+    <div class="section-title">Detected Acts</div>
+    <div class="sub-card">
+        <ul>
+            {% for act in acts %}
+            <li>{{ act }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+    {% if amounts %}
+    <div class="section-title">Amount Involved</div>
+    <div class="sub-card">
+        <ul>
+            {% for amt in amounts %}
+            <li>{{ amt }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+    {% if court or judge %}
+    <div class="sub-card">
+        {% if court and court != "Court Not Identified" %}
+        <p><b>Court:</b> {{ court }}</p>
+        {% endif %}
+        {% if judge and judge != "Judge Not Found" %}
+        <p><b>Judge:</b> {{ judge }}</p>
+        {% endif %}
+        {% if dates %}
+        <p><b>Date:</b> {{ dates[0] }}</p>
+        {% endif %}
+    </div>
+    {% endif %}
+    <div class="confidence-box">
+        AI Confidence Score: {{ confidence }}%
+    </div>
+    {% if nature %}
+        <div class="section-title">Nature of Dispute</div>
+        <p>{{ nature }}</p>
+    {% endif %}
+    {% if summary %}
+    <div class="section-title">Case Summary</div>
+    <p>{{ summary }}</p>
+    {% endif %}
+
+    {% if risk_analysis %}
+    <div class="section-title">Legal Risk Analysis</div>
+    <div class="sub-card">
+        <p style="white-space: pre-wrap;">{{ risk_analysis }}</p>
+    </div>
+    {% endif %}
+
+    {% if legal_arguments %}
+    <div class="section-title">AI Legal Arguments</div>
+    <div class="sub-card">
+        <pre style="white-space: pre-wrap;">{{ legal_arguments }}</pre>
+    </div>
+    {% endif %}
+
+    {% if legal_provisions and legal_provisions|length > 0 %}
+    <div class="section-title">Legal Provisions Identified</div>
+    <ul>
+        {% for law in legal_provisions %}
+        <li>{{ law }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% if court_decision %}
+    <div class="section-title">Court Decision</div>
+    <p>
+        <b>{{ court_decision }}</b>
+        <br>
+        <span style="color:gray">Confidence: {{ outcome_confidence }}</span>
+    </p>
+    {% endif %}
+    {% if subdivisions and subdivisions|length > 0 %}
+    <div class="section-title">Subdivisions</div>
+    <div class="sub-card">
+        <ul>
+            {% for sub in subdivisions %}
+            <li>{{ sub.title }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+    <div class="section-title">Detected Legal Issues</div>
+    {% for sub in subdivisions %}
+    <div class="sub-card">
+        <h4>{{ loop.index }}️⃣ {{ sub.title }}</h4>
+        <p><b>Law:</b> {{ sub.law }}</p>
+        <p><b>Severity:</b> {{ sub.severity }}</p>
+        <p><b>Legal Analysis:</b><br>{{ sub.explanation }}</p>
+    </div>
+    {% endfor %}
+    {% if section_explanations %}
+    <div class="section-title">Legal Section Explanation</div>
+    {% for sec in section_explanations %}
+    <div class="sub-card">
+        <h4>{{ sec.section }}</h4>
+        <p>{{ sec.explanation }}</p>
+    </div>
+    {% endfor %}
+    {% endif %}
+    <div class="section-title">AI Legal Reasoning Summary</div>
+    <div class="explain-box">
+        This case is classified as <b>{{ main_category }}</b> based strictly on the
+        content of the document. Legal provisions are displayed only if they are
+        explicitly mentioned in the case text. If no provisions are listed, the
+        document does not contain explicit statutory references.
+    </div>
+</div>
+{% if citations and citations|length > 0 %}
+<div class="section-title">Case Citations</div>
+<ul>
+    {% for c in citations %}
+    <li>{{ c }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+<h3>Ask Question About This Case</h3>
+<div class="sub-card">
+    <input type="text" id="caseQuestion" 
+    placeholder="Ask something about this case (e.g. What was the dispute?)"
+    style="width:70%;padding:8px;border-radius:6px;border:1px solid #ccc;">
+    <button onclick="askQuestion()" 
+        style="padding:8px 14px;background:#4a90e2;color:white;border:none;border-radius:6px;">
+        Ask
+    </button>
+</div>
+<div id="answerBox" class="sub-card"></div>
+
+{% if similar_cases %}
+<h3>Similar Cases</h3>
+{% if similar_cases and similar_cases|length > 0 %}
+    {% for case in similar_cases %}
+    <div class="case">
+        <p><b>{{ case.case_name }}</b></p>
+        <p>Category: {{ case.main_category }}</p>
+        <p>Similarity: {{ case.similarity }}%</p>
+    </div>
+    {% endfor %}
+{% else %}
+    <p>No similar cases found in this category.</p>
+{% endif %}
+{% endif %}
+<script>
+function askQuestion(){
+
+    let question = document.getElementById("caseQuestion").value;
+
+    if(!question){
+        alert("Please enter a question");
+        return;
+    }
+
+    document.getElementById("answerBox").innerText = "Thinking...";
+
+    let caseText = `{{ summary }} {{ nature }} {{ legal_provisions | join(" ") }}`;
+
+    fetch("/ask_case_question", {
+        method: "POST",
+        headers: {"Content-Type": "application/x-www-form-urlencoded"},
+        body: "question=" + encodeURIComponent(question) +
+              "&case_text=" + encodeURIComponent(caseText)
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("answerBox").innerText = data.answer;
+    });
+}
+</script>
+{% endblock %}

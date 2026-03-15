@@ -1,0 +1,224 @@
+{% extends "home.html" %}
+{% block content %}
+<style>
+body{
+    background:linear-gradient(135deg,#eef2ff,#f8fafc);
+    font-family:system-ui;
+}
+.container{
+    max-width:900px;
+    margin:auto;
+    padding:20px;
+}
+.card{
+    background:white;
+    padding:25px;
+    border-radius:14px;
+    margin-bottom:30px;
+    box-shadow:0 8px 30px rgba(0,0,0,0.05);
+}
+input, textarea{
+    width:100%;
+    border:1px solid #eee;
+    border-radius:10px;
+    padding:12px;
+    font-size:14px;
+}
+textarea{
+    height:110px;
+    resize:none;
+}
+.save-btn{
+    margin-top:12px;
+    padding:10px 20px;
+    background:#2c7be5;
+    color:white;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:600;
+}
+.top-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+    margin-bottom:25px;
+}
+.small-card{
+    padding:20px;
+}
+.stats{
+    display:flex;
+    justify-content:space-around;
+    margin-top:10px;
+}
+.stat{
+    text-align:center;
+}
+.stat-number{
+    font-size:22px;
+    font-weight:700;
+    display:block;
+}
+.stat-label{
+    font-size:13px;
+    color:#777;
+}
+.case-title{
+    font-size:18px;
+    font-weight:700;
+    margin-bottom:15px;
+}
+.case-card{
+    background:white;
+    padding:16px;
+    margin-bottom:12px;
+    border-radius:12px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.05);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+.case-card a{
+    text-decoration:none;
+    font-weight:600;
+    color:black;
+}
+.case-actions{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+.bookmark-btn{
+    background:none;
+    border:none;
+    font-size:18px;
+    cursor:pointer;
+    color:#444;
+}
+.bookmark-btn:hover{
+    color:black;
+}
+.remove-btn{
+    background:#ef4444;
+    color:white;
+    border:none;
+    padding:8px 16px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:600;
+}
+.remove-btn:hover{
+    background:#dc2626;
+}
+.pagination{
+    margin-top:20px;
+    text-align:center;
+}
+.page-btn{
+    padding:8px 12px;
+    margin:3px;
+    border-radius:6px;
+    text-decoration:none;
+    background:#eee;
+    color:black;
+}
+.page-btn.active{
+    background:black;
+    color:white;
+}
+.page-btn:hover{
+    background:#dbeafe;
+}
+.empty{
+    text-align:center;
+    color:#777;
+    padding:30px;
+}
+.toast{
+    position:fixed;
+    bottom:25px;
+    left:50%;
+    transform:translateX(-50%);
+    background:#111;
+    color:white;
+    padding:12px 20px;
+    border-radius:8px;
+    font-size:14px;
+    opacity:0;
+    transition:0.3s;
+    z-index:999;
+}
+.toast.show{
+    opacity:1;
+}
+</style>
+<div class="container">
+    <div class="card">
+        <h3>Write Notes</h3>
+        <input type="text" id="caseName" placeholder="Notes Name">
+        <br><br>
+        <textarea id="noteText" placeholder="Write your notes here..."></textarea>
+        <button class="save-btn" onclick="saveNote()">Save Notes</button>
+    </div>
+    <div class="case-title">My Cases</div>
+    {% if documents %}
+    {% for doc in documents %}
+    <div class="case-card case-item">
+        <a href="/view_note/{{ doc._id }}">
+            📁 {{ doc.case_name }}
+        </a>
+        <div class="case-actions">
+            <button class="bookmark-btn"
+            onclick="toggleBookmark('{{ doc._id }}', this)">
+            {% if doc.bookmarked %}
+            <i class="fa-solid fa-star"></i>
+            {% else %}
+            <i class="fa-regular fa-star"></i>
+            {% endif %}
+        </button>
+        <form action="/remove_case/{{ doc._id }}" method="POST">
+            <button type="submit" class="remove-btn">Remove</button>
+        </form>
+    </div>
+</div>
+{% endfor %}
+{% else %}
+<div class="empty">No cases saved yet</div>
+{% endif %}
+{% if total_pages > 1 %}
+<div class="pagination">
+    {% for p in range(1, total_pages + 1) %}
+    <a href="/cases?page={{p}}"
+        class="page-btn {% if p==current_page %}active{% endif %}">
+        {{p}}
+    </a>
+    {% endfor %}
+</div>
+{% endif %}
+</div>
+<div id="toast" class="toast"></div>
+<script>
+    async function toggleBookmark(id,btn){
+        let response = await fetch("/bookmark/"+id,{
+            method:"POST"
+        })
+        let data = await response.json()
+        let icon = btn.querySelector("i")
+        let toast = document.getElementById("toast")
+        if(data.bookmarked){
+            icon.classList.remove("fa-regular")
+            icon.classList.add("fa-solid")
+            toast.innerText="Bookmark added"
+        }else{
+            icon.classList.remove("fa-solid")
+            icon.classList.add("fa-regular")
+            toast.innerText="Bookmark removed"
+        }
+        toast.classList.add("show")
+        setTimeout(()=>{
+            toast.classList.remove("show")
+        },2000)
+    }
+</script>
+{% endblock %}

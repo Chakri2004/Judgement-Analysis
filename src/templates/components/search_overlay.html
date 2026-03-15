@@ -1,0 +1,157 @@
+<div id="searchOverlay" class="search-overlay" onclick="closeSearchOutside(event)">
+    <div class="search-box" onclick="event.stopPropagation();">
+        <div class="input-wrapper">
+            <input type="text"
+                   id="navbarSearch"
+                   placeholder="Search..."
+                   onkeyup="liveSearch()"
+                   autocomplete="off">
+            <button type="button"
+                    class="clear-btn"
+                    onclick="clearSearch()">
+                Cancel
+            </button>
+        </div>
+        <div id="searchSuggestions" class="suggestions"></div>
+    </div>
+</div>
+<style>
+.search-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(14px);
+    display: none;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 120px;
+    z-index: 3000;
+}
+.search-box {
+    width: 650px;
+    max-width: 100%;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(20px);
+    padding: 30px;
+    border-radius: 18px;
+    box-shadow: 0 25px 70px rgba(0,0,0,0.45);
+    display: flex;
+    flex-direction: column;
+}
+.input-wrapper {
+    position: relative;
+    width: 100%;
+}
+.input-wrapper input {
+    width: 100%;
+    padding: 14px 85px 14px 18px;
+    border: none;
+    border-radius: 12px;
+    outline: none;
+    font-size: 16px;
+}
+* {
+    box-sizing: border-box;
+}
+.clear-btn {
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    font-size: 14px;
+    font-weight: 500;
+    color: #444;
+    cursor: pointer;
+    display: none;
+    transition: 0.2s ease;
+}
+.clear-btn:hover {
+    color: black;
+}
+.suggestions {
+    margin-top: 18px;
+    width: 100%;
+    max-height: 280px;
+    overflow-y: auto;
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+}
+.suggestion-item {
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+.suggestion-item:hover {
+    background: #f3f3f3;
+}
+</style>
+<script>
+    window.caseData = {{ caseData | tojson | safe }};
+</script>
+<script>
+    function openSearch() {
+        const overlay = document.getElementById("searchOverlay");
+        overlay.style.display = "flex";
+        document.getElementById("navbarSearch").focus();
+    }
+    function closeSearch() {
+        document.getElementById("searchOverlay").style.display = "none";
+        document.getElementById("searchSuggestions").innerHTML = "";
+        document.getElementById("navbarSearch").value = "";
+        document.querySelector(".clear-btn").style.display = "none";
+    }
+    function closeSearchOutside(event) {
+        if (event.target.id === "searchOverlay") {
+            closeSearch();
+        }
+    }
+    document.addEventListener("keydown", function(e) {
+        if (e.key === "Escape") {
+            closeSearch();
+        }
+    });
+    function clearSearch() {
+        const input = document.getElementById("navbarSearch");
+        const suggestions = document.getElementById("searchSuggestions");
+        const clearBtn = document.querySelector(".clear-btn");
+        input.value = "";
+        suggestions.innerHTML = "";
+        clearBtn.style.display = "none";
+        input.focus();
+    }
+    function liveSearch() {
+        const inputField = document.getElementById("navbarSearch");
+        const input = inputField.value.toLowerCase();
+        const suggestions = document.getElementById("searchSuggestions");
+        const clearBtn = document.querySelector(".clear-btn");
+        suggestions.innerHTML = "";
+        if (!window.caseData) return;
+        clearBtn.style.display = input.length > 0 ? "block" : "none";
+        if (input.length === 0) return;
+        const filtered = window.caseData.filter(doc =>
+            (doc.title || "").toLowerCase().includes(input) ||
+            (doc.main_category || "").toLowerCase().includes(input) ||
+            (doc.status || "").toLowerCase().includes(input)
+        );
+        filtered.slice(0,6).forEach(doc => {
+            const div = document.createElement("div");
+            div.classList.add("suggestion-item");
+            div.innerHTML = `
+                <strong>${doc.title}</strong>
+                <br>
+                <small>${doc.main_category} • ${doc.status}</small>
+            `;
+            div.onclick = () => {
+                if(doc.type === "note"){
+                    window.location.href = "/view_note/" + doc._id;
+                }else{
+                    window.location.href = "/view/" + doc._id;
+                }
+            };
+            suggestions.appendChild(div);
+        });
+    }
+</script>

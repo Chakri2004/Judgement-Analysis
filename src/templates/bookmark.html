@@ -1,0 +1,141 @@
+{% extends "home.html" %}
+{% block content %}
+
+<style>
+.bookmark-container{
+    max-width:900px;
+    margin:auto;
+}
+h1{
+    margin-bottom:25px;
+}
+h1 i{
+    margin-right:8px;
+    font-size:26px;
+}
+.bookmark-card a{
+    text-decoration:none;
+    color:#2c3e50;
+    font-weight:600;
+    font-size:16px;
+    display:block;
+    width:100%;
+}
+
+.bookmark-card a:hover{
+    color:black;
+}
+.bookmark-card{
+    background:white;
+    padding:20px;
+    margin-top:15px;
+    border-radius:10px;
+    box-shadow:0 5px 20px rgba(0,0,0,0.05);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+.bookmark-card:hover{
+    transform:translateY(-3px);
+    box-shadow:0 8px 20px rgba(0,0,0,0.08);
+}
+
+.case-name{
+    font-size:16px;
+    font-weight:600;
+}
+
+.case-actions{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.remove-btn{
+    background:none;
+    border:none;
+    font-size:18px;
+    cursor:pointer;
+}
+
+.remove-btn:hover{
+    color:black;
+}
+.toast{
+    position:fixed;
+    bottom:25px;
+    left:50%;
+    transform:translateX(-50%);
+    background:#111;
+    color:white;
+    padding:12px 20px;
+    border-radius:8px;
+    font-size:14px;
+    opacity:0;
+    transition:0.3s;
+    z-index:999;
+}
+.toast.show{
+    opacity:1;
+}
+.empty{
+    color:#777;
+    margin-top:20px;
+}
+</style>
+
+<div class="bookmark-container">
+    <h1>Bookmarked Cases</h1>
+    {% if documents %}
+    {% for doc in documents %}
+    <div class="bookmark-card">
+        <div style="flex:1">
+            <div class="case-name">
+                {% if doc.type == "note" %}
+                <a href="{{ url_for('view_note', id=doc._id) }}">
+                    {{ doc.case_name }}
+                </a>
+                {% else %}
+                <a href="{{ url_for('view_prediction', id=doc._id) }}">
+                    {{ doc.nature_of_dispute[:80] }}...
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="case-actions">
+            <button class="remove-btn"
+                onclick="event.stopPropagation(); removeBookmark('{{ doc._id }}', this)">
+                <i class="fa-solid fa-star"></i>
+            </button>
+            {% if doc.type != "note" %}
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <p class="empty">No bookmarked cases yet.</p>
+    {% endif %}
+</div>
+<div id="toast" class="toast"></div>
+<script>
+    async function removeBookmark(id,btn){
+        let response = await fetch("/bookmark/"+id,{
+            method:"POST"
+        })
+        let data = await response.json()
+        if(!data.bookmarked){
+            let card = btn.closest(".bookmark-card")
+            card.remove()
+            let toast = document.getElementById("toast")
+            toast.innerText="Bookmark removed"
+            toast.classList.add("show")
+            setTimeout(()=>{
+                toast.classList.remove("show")
+            },2000)
+        }
+    }
+</script>
+{% endblock %}

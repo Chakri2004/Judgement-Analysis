@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Case Note</title>
+        <style>
+        body{
+            font-family:Segoe UI;
+            background:#f4f6fb;
+            padding:40px;
+        }
+        .container{
+            max-width:900px;
+            margin:auto;
+            background:white;
+            padding:30px;
+            border-radius:10px;
+            box-shadow:0 8px 25px rgba(0,0,0,0.05);
+        }
+        h2{
+            margin-bottom:20px;
+        }
+        .note{
+            line-height:1.6;
+            white-space:pre-wrap;
+        }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h2>{{ doc.case_name }}</h2>
+            <div class="note">
+                {{ doc.note }}
+            </div>
+        </div>
+    </body>
+</html>

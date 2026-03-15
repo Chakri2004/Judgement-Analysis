@@ -1,0 +1,294 @@
+{% extends "home.html" %}
+{% block content %}
+<style>
+.profile-container {
+    max-width: 900px;
+    margin: auto;
+}
+.profile-card {
+    background: white;
+    border-radius: 16px;
+    padding: 40px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.06);
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    margin-bottom: 30px;
+}
+.avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 42px;
+    color: white;
+    font-weight: bold;
+    border: 2px solid rgba(255,255,255,0.5);
+}
+.profile-info h2 {
+    margin: 0;
+    font-size: 26px;
+}
+.profile-info p {
+    margin: 6px 0;
+    color: gray;
+    font-size: 14px;
+}
+.section-card {
+    background: white;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    margin-bottom: 25px;
+}
+.section-card h3 {
+    margin-bottom: 20px;
+}
+.form-group {
+    margin-bottom: 15px;
+}
+label {
+    font-size: 14px;
+    font-weight: 600;
+}
+input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    margin-top: 5px;
+}
+.input-wrapper {
+    position: relative;
+}
+.input-wrapper input {
+    padding-right: 40px;
+}
+.edit-btn {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 16px;
+    color: black;
+}
+.edit-btn:hover {
+    color: rgb(159, 158, 158);
+}
+input[readonly] {
+    background-color: #f5f6fa;
+}
+select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    margin-top: 5px;
+}
+.btn-save {
+    margin-top: 15px;
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: none;
+    background: #2c7be5;
+    color: white;
+    cursor: pointer;
+}
+.btn-danger {
+    margin-top: 15px;
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: none;
+    background: #e74c3c;
+    color: white;
+    cursor: pointer;
+}
+.btn-save:hover {
+    background: #1a5edb;
+}
+.btn-danger:hover {
+    background: #c0392b;
+}
+.info-text {
+    font-size: 14px;
+    color: #555;
+    line-height: 1.6;
+}
+</style>
+<div class="profile-container">
+    <div class="profile-card">
+        <div class="avatar">
+            {% set name_parts = current_user.name.split() %}
+            {% if name_parts|length > 1 %}
+                {{ name_parts[0][0]|upper }}{{ name_parts[1][0]|upper }}
+            {% else %}
+                {{ name_parts[0][0]|upper }}
+            {% endif %}
+        </div>
+        <div class="profile-info">
+            <h2>{{ current_user.name }}</h2>
+            <p><strong>Email:</strong> {{ current_user.email }}</p>
+            <p>
+                <strong>Date of Birth:</strong>
+                {{ current_user.dob if current_user.dob else "Not Set" }}
+            </p>
+        </div>
+    </div>
+    <div class="section-card">
+        <h3>Edit Profile</h3>
+        <form method="POST">
+            <div class="form-group edit-group">
+                <label>Full Name</label>
+                <div class="input-wrapper">
+                    <input type="text"
+                        name="name"
+                        value="{{ current_user.name }}"
+                        id="nameField"
+                        readonly required>
+                    <span class="edit-btn" onclick="enableEdit('nameField', this)">
+                        EDIT
+                    </span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Date of Birth</label>
+                <input type="text"
+                    name="dob"
+                    value="{{ current_user.dob if current_user.dob else '' }}"
+                    placeholder="YYYY-MM-DD"
+                    pattern="\d{4}-\d{2}-\d{2}"
+                    title="Enter date in YYYY-MM-DD format">
+            </div>
+            <div class="form-group">
+                <label>Gender</label>
+                <select name="gender">
+                    <option value="Male"
+                        {% if current_user.gender == 'Male' %}selected{% endif %}>
+                        Male
+                    </option>
+                    <option value="Female"
+                        {% if current_user.gender == 'Female' %}selected{% endif %}>
+                        Female
+                    </option>
+                    <option value="Other"
+                        {% if current_user.gender == 'Other' %}selected{% endif %}>
+                        Other
+                    </option>
+                </select>
+            </div>
+            <div class="form-group edit-group">
+                <label>Email Address</label>
+                <div class="input-wrapper">
+                    <input type="email"
+                        name="email"
+                        value="{{ current_user.email }}"
+                        id="emailField"
+                        readonly required>
+                    <span class="edit-btn" onclick="enableEdit('emailField', this)">
+                        EDIT
+                    </span>
+                </div>
+            </div>
+            <div class="form-group edit-group">
+                <label>Mobile Number</label>
+                <div class="input-wrapper">
+                    <input type="text"
+                        name="mobile"
+                        value="{{ current_user.mobile }}"
+                        id="mobileField"
+                        readonly>
+                    <span class="edit-btn" onclick="enableEdit('mobileField', this)">
+                        EDIT
+                    </span>
+                </div>
+            </div>
+            <div class="form-group edit-group">
+                <label>Password</label>
+                <div class="input-wrapper">
+                    <input type="password" value="************" readonly>
+                    <span class="edit-btn" onclick="openPasswordModal()">
+                        EDIT
+                    </span>
+                </div>
+            </div>
+            <button type="submit" class="btn-save">
+                Save Changes
+            </button>
+        </form>
+    </div>
+    <div class="section-card">
+        <h3>Account</h3>
+        <p class="info-text">
+            Click below to securely logout your account.
+        </p>
+        <form action="{{ url_for('auth.logout') }}" method="GET">
+            <button type="submit" class="btn-danger">
+                Log Out
+            </button>
+        </form>
+    </div>
+    <div class="section-card">
+        <h3>Manage Account</h3>
+        <p class="info-text">
+            Deleting your account is permanent and cannot be undone.
+            All your personal data will be permanently removed from the system.
+        </p>
+        <form action="{{ url_for('delete_account') }}" method="POST">
+            <button type="submit" class="btn-danger">
+                Delete Account
+            </button>
+        </form>
+    </div>
+</div>
+</div>
+<div id="passwordModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4); z-index:999;">
+    <div style="background:white; width:400px; padding:25px; border-radius:10px; margin:10% auto; position:relative;">
+        <span onclick="closePasswordModal()" 
+              style="position:absolute; right:15px; top:10px; cursor:pointer;">
+            ✖
+        </span>
+        <h3>Change Password</h3>
+        <form method="POST" action="{{ url_for('change_password') }}">
+            <div class="form-group">
+                <label>Old Password</label>
+                <input type="password" name="old_password" required>
+            </div>
+            <div class="form-group">
+                <label>New Password</label>
+                <input type="password" name="new_password" required>
+            </div>
+            <div style="margin-top:10px;">
+                <a href="{{ url_for('auth.forgot_password') }}">
+                    Forgot Password?
+                </a>
+            </div>
+            <button type="submit" class="btn-save" style="margin-top:15px;">
+                Update Password
+            </button>
+        </form>
+    </div>
+</div>
+<script>
+function enableEdit(fieldId, element) {
+    const field = document.getElementById(fieldId);
+    if (field.hasAttribute("readonly")) {
+        field.removeAttribute("readonly");
+        field.focus();
+        element.innerText = "DONE";
+    } else {
+        field.setAttribute("readonly", true);
+        element.innerText = "EDIT";
+    }
+}
+function openPasswordModal() {
+    document.getElementById("passwordModal").style.display = "block";
+}
+function closePasswordModal() {
+    document.getElementById("passwordModal").style.display = "none";
+}
+</script>
+{% endblock %}
